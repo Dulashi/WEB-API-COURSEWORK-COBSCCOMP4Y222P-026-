@@ -1,11 +1,13 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+const cors = require('cors'); 
 
 const app = express();
 const port = 3000;
 
 app.use(bodyParser.json());
+app.use(cors()); 
 
 const weatherSchema = new mongoose.Schema({
     administrative_district: { type: String, required: true, unique: true },
@@ -32,40 +34,20 @@ mongoose.connect(mongoURI, {
     console.error('MongoDB Atlas connection error:', err);
 });
 
-
-app.post('/weather', async (req, res) => {
-    try {
-        const { administrative_district, temperature, humidity, airPressure } = req.body;
-        
-        const newWeather = new Weather({
-            administrative_district,
-            temperature,
-            humidity,
-            airPressure
-        });
-        
-        const savedWeather = await newWeather.save();
-        
-        res.status(201).json(savedWeather);
-    } catch (err) {
-        console.error('Error storing weather data:', err);
-        res.status(500).json({ message: 'Internal server error' });
-    }
-});
-
-
 app.get('/weather', async (req, res) => {
     try {
-        const weatherData = await Weather.find().sort({ timestamp: -1 }).limit(1);
-        
-        console.log('Weather data fetched successfully:', weatherData);
+        const weatherData = await Weather.find().sort({ timestamp: -1 });
 
-        res.json(weatherData);
+        console.log('Weather data fetched successfully:', weatherData);
+        const jsonData = JSON.stringify(weatherData);
+        res.setHeader('Content-Type', 'application/json');
+        res.status(200).send(jsonData);
     } catch (err) {
         console.error('Error fetching weather data:', err);
         res.status(500).json({ message: 'Internal server error' });
     }
 });
+
 
 app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);
