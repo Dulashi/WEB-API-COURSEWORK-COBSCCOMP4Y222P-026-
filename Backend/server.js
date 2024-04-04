@@ -1,13 +1,13 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-const cors = require('cors'); 
+const cors = require('cors');
 
 const app = express();
 const port = 3000;
 
 app.use(bodyParser.json());
-app.use(cors()); 
+app.use(cors());
 
 const weatherSchema = new mongoose.Schema({
     administrative_district: { type: String, required: true, unique: true },
@@ -19,8 +19,8 @@ const weatherSchema = new mongoose.Schema({
 
 const Weather = mongoose.model('Weather', weatherSchema);
 
-const mongoPassword = process.env.MONGO_PASSWORD; 
-const newMongoPassword = 'MYdulashijc2002'; 
+const mongoPassword = process.env.MONGO_PASSWORD;
+const newMongoPassword = 'MYdulashijc2002';
 const mongoURI = `mongodb+srv://Dulashi:${newMongoPassword}@cluster0.9judisz.mongodb.net/weather_information`;
 
 mongoose.connect(mongoURI, {
@@ -34,20 +34,36 @@ mongoose.connect(mongoURI, {
     console.error('MongoDB Atlas connection error:', err);
 });
 
-app.get('/weather', async (req, res) => {
-    try {
-        const weatherData = await Weather.find().sort({ timestamp: -1 });
 
-        console.log('Weather data fetched successfully:', weatherData);
-        const jsonData = JSON.stringify(weatherData);
-        res.setHeader('Content-Type', 'application/json');
-        res.status(200).send(jsonData);
+app.get('/weather/district', async (req, res) => {
+    try {
+        const weatherData = await Weather.find();
+        if (!weatherData) {
+            return res.status(404).json({ message: 'Weather data not found for any district' });
+        }
+        console.log('Weather data fetched successfully for all districts:', weatherData);
+        res.status(200).json(weatherData);
     } catch (err) {
-        console.error('Error fetching weather data:', err);
+        console.error('Error fetching weather data for all districts:', err);
         res.status(500).json({ message: 'Internal server error' });
     }
 });
 
+
+app.get('/weather/:district', async (req, res) => {
+    const district = req.params.district;
+    try {
+        const weatherData = await Weather.findOne({ administrative_district: district }).sort({ timestamp: -1 });
+        if (!weatherData) {
+            return res.status(404).json({ message: 'Weather data not found for district: ' + district });
+        }
+        console.log('Weather data fetched successfully for district:', district, ':', weatherData);
+        res.status(200).json(weatherData);
+    } catch (err) {
+        console.error('Error fetching weather data for district:', district, ':', err);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
 
 app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);

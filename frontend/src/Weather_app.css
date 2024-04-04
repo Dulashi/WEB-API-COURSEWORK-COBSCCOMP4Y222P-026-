@@ -1,0 +1,26 @@
+
+.weather-container {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 150vh;
+}
+
+.weather-image {
+    max-width: 90%; 
+    max-height: 100vh;
+}
+
+.district-marker {
+    position: absolute;
+    background-color: rgba(0, 0, 255, 0.5); 
+    border: 1px solid blue;
+    border-radius: 50%; 
+    width: 15px;
+    height: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
