@@ -37,7 +37,7 @@ const WeatherComponent = () => {
             console.error('Error fetching weather data for district:', district, ':', error);
         }
     };
-
+    
     // Manually setting positions for each district though the districts names are taken from the backend
     const districtPositions = {
         "Ampara": { x: 1034, y: 750 },

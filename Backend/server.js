@@ -35,6 +35,27 @@ mongoose.connect(mongoURI, {
 });
 
 
+const generateWeatherData = async () => {
+    try {
+        const districts = ['Ampara', 'Anuradhapura', 'Badulla', 'Batticaloa', 'Colombo', 'Galle', 'Gampaha', 'Hambantota', 'Jaffna', 'Kaluthara', 'Kandy', 'Kegalle', 'Kilinochchi', 'Kurunegala', 'Mannar', 'Matale', 'Matara', 'Monaragala', 'Mulllaitivu', 'Nuwara Eliya', 'Polonnaruwa', 'Puttalam', 'Ratnapura', 'Trincomalee', 'Vavuniya'];
+
+        for (const district of districts) {
+            const data = {
+                temperature: Math.random() * 40,
+                humidity: Math.random() * 100,
+                airPressure: Math.random() * 2000 + 900,
+            };
+            await Weather.findOneAndUpdate({ administrative_district: district }, data, { upsert: true });
+        }
+        console.log('Weather data updated successfully');
+    } catch (error) {
+        console.error('Error updating weather data:', error);
+    }
+};
+
+// Call generateWeatherData every 5 minutes
+setInterval(generateWeatherData, 300000); // 300000 milliseconds = 5 minutes
+
 app.get('/weather/district', async (req, res) => {
     try {
         const weatherData = await Weather.find();
