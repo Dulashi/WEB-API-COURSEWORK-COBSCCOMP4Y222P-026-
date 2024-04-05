@@ -41,9 +41,9 @@ const generateWeatherData = async () => {
 
         for (const district of districts) {
             const data = {
-                temperature: Math.random() * 40,
-                humidity: Math.random() * 100,
-                airPressure: Math.random() * 2000 + 900,
+                temperature: (Math.random() * 40).toFixed(2),
+                humidity: (Math.random() * 100).toFixed(2),
+                airPressure: (Math.random() * 2000 + 900).toFixed(2),
             };
             await Weather.findOneAndUpdate({ administrative_district: district }, data, { upsert: true });
         }
