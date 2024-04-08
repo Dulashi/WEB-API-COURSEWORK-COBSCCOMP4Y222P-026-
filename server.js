@@ -53,8 +53,8 @@ const generateWeatherData = async () => {
     }
 };
 
-// Call generateWeatherData every 5 minutes
-setInterval(generateWeatherData, 300000); // 300000 milliseconds = 5 minutes
+// Call generateWeatherData every 5 minutes and it was 300000 milliseconds = 5 minutes before but now it set for only one due to below mentioned reason
+setInterval(generateWeatherData, 86400000);  // One API call will be there bacause of the demostration purposes and limited credit in Cyclic 
 
 app.get('/weather/district', async (req, res) => {
     try {
