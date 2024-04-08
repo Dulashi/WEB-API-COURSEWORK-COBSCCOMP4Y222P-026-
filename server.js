@@ -2,12 +2,39 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const swaggerUI = require('swagger-ui-express');
+const swaggerSpec = require('./swaggerConfig');
+
 
 const app = express();
-const port = 3000;
+const port = 3000;  // the application is not running in this port anymore , because it is deployed in Cyclic
 
 app.use(bodyParser.json());
 app.use(cors());
+
+
+app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerSpec));
+
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     Weather:
+ *       type: object
+ *       properties:
+ *         administrative_district:
+ *           type: string
+ *         temperature:
+ *           type: number
+ *         humidity:
+ *           type: number
+ *         airPressure:
+ *           type: number
+ *         timestamp:
+ *           type: string
+ *           format: date-time
+ */
+
 
 const weatherSchema = new mongoose.Schema({
     administrative_district: { type: String, required: true, unique: true },
@@ -56,6 +83,27 @@ const generateWeatherData = async () => {
 // Call generateWeatherData every 5 minutes and it was 300000 milliseconds = 5 minutes before but now it set for only one due to below mentioned reason
 setInterval(generateWeatherData, 86400000);  // One API call will be there bacause of the demostration purposes and limited credit in Cyclic 
 
+/**
+ * @swagger
+ * /weather/district:
+ *   get:
+ *     summary: Get weather data for all districts
+ *     responses:
+ *       '200':
+ *         description: A list of weather data for all districts
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Weather'
+ *       '404':
+ *         description: Weather data not found for any district
+ *       '500':
+ *         description: Internal server error
+ */
+
+
 app.get('/weather/district', async (req, res) => {
     try {
         const weatherData = await Weather.find();
@@ -69,6 +117,32 @@ app.get('/weather/district', async (req, res) => {
         res.status(500).json({ message: 'Internal server error' });
     }
 });
+
+
+/**
+ * @swagger
+ * /weather/{district}:
+ *   get:
+ *     summary: Get weather data for a specific district
+ *     parameters:
+ *       - in: path
+ *         name: district
+ *         required: true
+ *         description: Name of the district
+ *         schema:
+ *           type: string
+ *     responses:
+ *       '200':
+ *         description: Weather data for the specified district
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Weather'
+ *       '404':
+ *         description: Weather data not found for the specified district
+ *       '500':
+ *         description: Internal server error
+ */
 
 
 app.get('/weather/:district', async (req, res) => {
@@ -87,5 +161,7 @@ app.get('/weather/:district', async (req, res) => {
 });
 
 app.listen(port, () => {
-    console.log(`Server running at http://localhost:${port}`);
+    console.log(`Server running at http://localhost:${port}`); // the application is not running in this port anymore , because it is deployed in Cyclic
 });
+
+
